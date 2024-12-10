@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coral Reef Health Simulator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+        nav {
+            background-color: #3498db;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 0 10px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            appearance: none;
+            outline: none;
+            height: 8px;
+            background: #ddd;
+            transition: background 0.3s ease-in-out;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            border: 2px solid #2980b9;
+            cursor: pointer;
+            appearance: none;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3498db;
+            border: 2px solid #2980b9;
+            cursor: pointer;
+        }
+        input[type="range"]:hover {
+            background: #ccc;
+        }
+        .status-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .status-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .status {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function updateCoralHealth() {
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const pH = parseFloat(document.getElementById('pH').value);
+            const pollution = parseFloat(document.getElementById('pollution').value);
+            const pco2 = parseFloat(document.getElementById('pco2').value);
+
+            document.getElementById('temperature-value').textContent = temperature;
+            document.getElementById('pH-value').textContent = pH;
+            document.getElementById('pollution-value').textContent = pollution;
+            document.getElementById('pco2-value').textContent = pco2;
+
+            let tempEffect;
+            if (temperature <= 64 || temperature >= 90) {
+                tempEffect = 3;
+            } else if (temperature >= 85 && temperature <= 86) {
+                tempEffect = 1;
+            } else if (temperature > 86 && temperature < 90) {
+                tempEffect = 2;
+            } else if (temperature < 73 && temperature >= 71) {
+                tempEffect = 1;
+            } else if (temperature < 71 && temperature > 64) {
+                tempEffect = 2;
+            } else {
+                tempEffect = 0;
+            }
+
+            let pHEffect;
+            if (pH >= 8.2 && pH <= 8.4) {
+                pHEffect = 0;
+            } else if (pH < 8.2 && pH >= 8.1) {
+                pHEffect = 1;
+            } else if (pH < 8.1 && pH >= 7.9) {
+                pHEffect = 2;
+            } else {
+                pHEffect = 3;
+            }
+
+            let pollutionEffect;
+            if (pollution >= 8) {
+                pollutionEffect = 3;
+            } else if (pollution >= 6) {
+                pollutionEffect = 2;
+            } else if (pollution >= 4) {
+                pollutionEffect = 1;
+            } else {
+                pollutionEffect = 0;
+            }
+
+            let carbon;
+            if (pco2 >= 400 && pco2 < 560) {
+                carbon = 1;
+            } else if (pco2 >= 560 && pco2 < 720) {
+                carbon = 2;
+            } else if (pco2 >= 720) {
+                carbon = 3;
+            } else {
+                carbon = 0;
+            }
+
+            const health = Math.max(tempEffect, pHEffect, pollutionEffect, carbon);
+
+            let coralImage;
+            let status;
+            if (health === 0) {
+                coralImage = "static/Healthy.png";
+                real = "static/healthy_coral.jpg";
+                status = "Healthy";
+            } else if (health === 1) {
+                coralImage = "static/stressed.png";
+                real = "static/stressed_coral.webp";
+                status = "Stressed";
+            } else if (health === 2) {
+                coralImage = "static/bleached.png";
+                real = "static/bleached_coral.jpg";
+                status = "Bleached";
+            } else {
+                coralImage = "static/dead.png";
+                real = "static/dead_coral.webp";
+                status = "Dead";
+            }
+
+            document.getElementById('health-score').textContent = status;
+            document.getElementById('real-image').src = real
+            document.getElementById('coral-image').src = coralImage;
+        }
+    </script>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/coral-info">Coral Info</a>
+        <a href="/sources">Sources</a>
+    </nav>
+
+    <h1>Welcome to the Coral Reef Health Simulator</h1>
+    <form oninput="updateCoralHealth()">
+        <label for="temperature">Temperature (°F): <span id="temperature-value">75</span></label>
+        <input type="range" id="temperature" name="temperature" min="60" max="95" step="1" value="75"><br>
+
+        <label for="pH">pH Level: <span id="pH-value">8.2</span></label>
+        <input type="range" id="pH" name="pH" min="7.6" max="8.4" step="0.1" value="8.2"><br>
+
+        <label for="pollution">Pollution Level (0-10): <span id="pollution-value">0</span></label>
+        <input type="range" id="pollution" name="pollution" min="0" max="10" step="1" value="0"><br>
+
+        <label for="pco2">Atmospheric pCO₂ (ppm): <span id="pco2-value">400</span></label>
+        <input type="range" id="pco2" name="pco2" min="50" max="1000" step="10" value="390"><br>
+    </form>
+
+    <div class="status-container">
+        <h2>Coral Health Status: <span id="health-score">Healthy</span></h2>
+        <img id="coral-image" src="static/Healthy.png" alt="Coral Health Image">
+        <img id="real-image" src="static/healthy_coral.jpg" alt="Health Image">
+    </div>
+</body>
+</html>
